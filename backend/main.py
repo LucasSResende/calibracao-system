@@ -57,7 +57,7 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
         username = form_data.username
-        password = form_data.password
+        password = form_data.password.strip()  # ✅ IMPORTANTE
 
         cursor.execute("SELECT * FROM users WHERE username=%s", (username,))
         user = cursor.fetchone()
@@ -65,7 +65,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         if not user:
             raise HTTPException(status_code=401, detail="Usuário não encontrado")
 
-        # ajuste do índice (caso sua tabela seja diferente)
         hashed_password = user[2]
 
         if not verify_password(password, hashed_password):
@@ -81,6 +80,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     except Exception as e:
         print("ERRO LOGIN:", e)
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # CADASTRAR USUÁRIO
 @app.post("/register")
