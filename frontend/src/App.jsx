@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const API = "https://calibracao-system.onrender.com";
+
 export default function App() {
   const [logged, setLogged] = useState(false);
   const [tools, setTools] = useState([]);
@@ -12,12 +14,13 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
+  // ✅ LOGIN
   const login = async () => {
     const formData = new URLSearchParams();
     formData.append("username", user);
     formData.append("password", pass);
 
-    const res = await fetch("http://127.0.0.1:8000/login", {
+    const res = await fetch(`${API}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -30,15 +33,17 @@ export default function App() {
     if (data.access_token) {
       localStorage.setItem("token", data.access_token);
       setLogged(true);
+      loadTools();
     } else {
       alert("Erro login");
     }
   };
 
+  // ✅ CARREGAR FERRAMENTAS
   const loadTools = async () => {
     const token = localStorage.getItem("token");
 
-    const res = await fetch("http://127.0.0.1:8000/tools", {
+    const res = await fetch(`${API}/tools`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -48,11 +53,12 @@ export default function App() {
     setTools(data);
   };
 
+  // ✅ ADICIONAR FERRAMENTA
   const addTool = async () => {
     const token = localStorage.getItem("token");
 
     await fetch(
-      `http://127.0.0.1:8000/tools?name=${name}&responsible=${responsible}&entry_date=${date}&months=${months}`,
+      `${API}/tools?name=${name}&responsible=${responsible}&entry_date=${date}&months=${months}`,
       {
         method: "POST",
         headers: {
@@ -64,6 +70,7 @@ export default function App() {
     loadTools();
   };
 
+  // ✅ MANTER LOGIN
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -72,19 +79,27 @@ export default function App() {
     }
   }, []);
 
+  // ✅ TELA LOGIN
   if (!logged) {
     return (
-      <div>
+      <div style={{ padding: "20px" }}>
         <h2>Login</h2>
         <input placeholder="Usuário" onChange={e => setUser(e.target.value)} />
-        <input type="password" placeholder="Senha" onChange={e => setPass(e.target.value)} />
+        <br /><br />
+        <input
+          type="password"
+          placeholder="Senha"
+          onChange={e => setPass(e.target.value)}
+        />
+        <br /><br />
         <button onClick={login}>Entrar</button>
       </div>
     );
   }
 
+  // ✅ TELA PRINCIPAL
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Sistema de Calibração</h2>
 
       <input placeholder="Nome" onChange={e => setName(e.target.value)} />
@@ -93,6 +108,8 @@ export default function App() {
       <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
 
       <button onClick={addTool}>Adicionar</button>
+
+      <h3>Ferramentas</h3>
 
       {tools.map(t => (
         <div key={t.id}>
