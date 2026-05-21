@@ -23,6 +23,10 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
+  const [selectedTools, setSelectedTools] = useState([]);
+  const [deleteMode, setDeleteMode] = useState(false);
+
+  // LOGIN
   const login = async () => {
     const formData = new URLSearchParams();
     formData.append("username", user);
@@ -52,6 +56,7 @@ export default function App() {
     setLogged(false);
   };
 
+  // LOAD
   const loadTools = async () => {
     const token = localStorage.getItem("token");
 
@@ -65,6 +70,7 @@ export default function App() {
     setTools(Array.isArray(data) ? data : []);
   };
 
+  // ADD
   const addTool = async () => {
     const token = localStorage.getItem("token");
 
@@ -79,6 +85,39 @@ export default function App() {
     );
 
     loadTools();
+  };
+
+  // DELETE
+  const deleteSelected = async () => {
+    if (selectedTools.length === 0) {
+      alert("Selecione itens");
+      return;
+    }
+
+    if (!window.confirm("Confirmar exclusão?")) return;
+
+    const token = localStorage.getItem("token");
+
+    for (const id of selectedTools) {
+      await fetch(`${API}/tools/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
+
+    setSelectedTools([]);
+    setDeleteMode(false);
+    loadTools();
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedTools(prev =>
+      prev.includes(id)
+        ? prev.filter(x => x !== id)
+        : [...prev, id]
+    );
   };
 
   useEffect(() => {
@@ -101,55 +140,33 @@ export default function App() {
         justifyContent: "center"
       }}>
         <div style={{
-          background: "rgba(0,0,50,0.85)",
+          background: "rgba(0,0,50,0.9)",
           padding: 30,
           borderRadius: 10,
-          color: "white",
           width: 280,
-          textAlign: "center",
-          boxShadow: "0px 4px 15px rgba(0,0,0,0.8)"
+          color: "white",
+          textAlign: "center"
         }}>
           <h2>⚓ Login Naval</h2>
 
-          <input
-            placeholder="Usuário"
-            onChange={e => setUser(e.target.value)}
-            style={{ width: "100%", padding: 6 }}
-          /><br /><br />
+          <input placeholder="Usuário" onChange={e => setUser(e.target.value)} /><br /><br />
+          <input type="password" placeholder="Senha" onChange={e => setPass(e.target.value)} /><br /><br />
 
-          <input
-            type="password"
-            placeholder="Senha"
-            onChange={e => setPass(e.target.value)}
-            style={{ width: "100%", padding: 6 }}
-          /><br /><br />
-
-          <button onClick={login} style={{
-            background: "#1e40af",
-            color: "white",
-            padding: 8,
-            border: "none",
-            width: "100%"
-          }}>
-            Entrar
-          </button>
+          <button onClick={login}>Entrar</button>
         </div>
       </div>
     );
   }
 
-  // GRÁFICO
-  const validCount = tools.filter(t => new Date(t.expiry_date) >= new Date()).length;
-  const expiredCount = tools.filter(t => new Date(t.expiry_date) < new Date()).length;
+  const valid = tools.filter(t => new Date(t.expiry_date) >= new Date()).length;
+  const expired = tools.filter(t => new Date(t.expiry_date) < new Date()).length;
 
   const chartData = {
     labels: ["OK", "Vencidos"],
-    datasets: [
-      {
-        data: [validCount, expiredCount],
-        backgroundColor: ["#22c55e", "#dc2626"]
-      }
-    ]
+    datasets: [{
+      data: [valid, expired],
+      backgroundColor: ["green", "red"]
+    }]
   };
 
   return (
@@ -157,24 +174,32 @@ export default function App() {
       minHeight: "100vh",
       background: "#0f172a",
       color: "white",
-      fontSize: 12,
-      fontFamily: "Arial"
+      fontSize: 12
     }}>
       {/* TOPO */}
       <div style={{
         display: "flex",
         justifyContent: "space-between",
-        padding: "10px 20px",
+        padding: 10,
         borderBottom: "1px solid #334155"
       }}>
         <strong>⚓ Sistema Naval</strong>
-        <button onClick={logout} style={{
-          background: "none",
-          color: "white",
-          border: "none"
-        }}>
-          Logout ⏻
-        </button>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => setDeleteMode(!deleteMode)}>
+            🗑️ {deleteMode ? "Cancelar" : "Excluir"}
+          </button>
+
+          {deleteMode && (
+            <button onClick={deleteSelected}>
+              Confirmar
+            </button>
+          )}
+
+          <button onClick={logout}>
+            Logout ⏻
+          </button>
+        </div>
       </div>
 
       <div style={{ padding: 20 }}>
@@ -206,10 +231,9 @@ export default function App() {
 
         <div style={{
           background: "#1e293b",
-          padding: 10,
-          borderRadius: 5
+          padding: 10
         }}>
-          {tools.map((t) => {
+          {tools.map(t => {
             const expired = new Date(t.expiry_date) < new Date();
 
             return (
@@ -217,11 +241,24 @@ export default function App() {
                 display: "flex",
                 justifyContent: "space-between",
                 borderBottom: "1px solid #334155",
-                padding: "6px 0"
+                padding: "5px"
               }}>
-                <span>{t.name}</span>
+                <div style={{ display: "flex", gap: 5 }}>
+
+                  {deleteMode && (
+                    <input
+                      type="checkbox"
+                      checked={selectedTools.includes(t.id)}
+                      onChange={() => toggleSelect(t.id)}
+                    />
+                  )}
+
+                  <span>{t.name}</span>
+                </div>
+
                 <span>{t.responsible}</span>
                 <span>{t.expiry_date}</span>
+
                 <span style={{ color: expired ? "red" : "lightgreen" }}>
                   {expired ? "VENCIDO" : "OK"}
                 </span>
