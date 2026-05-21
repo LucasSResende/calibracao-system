@@ -210,9 +210,15 @@ export default function App() {
     );
   }
 
-  const validCount = tools.filter(t => new Date(t.expiry_date) >= new Date()).length;
-  const expiredCount = tools.filter(t => new Date(t.expiry_date) < new Date()).length;
+  const validCount = tools.filter(t => {
+    if (!t.expiry_date) return false;
+    return new Date(t.expiry_date) >= new Date();
+  }).length;
 
+  const expiredCount = tools.filter(t => {
+    if (!t.expiry_date) return false;
+    return new Date(t.expiry_date) < new Date();
+  }).length;
 
   const chartData = {
     labels: ["Em dia", "Vencidas"],
@@ -322,7 +328,10 @@ export default function App() {
             borderRadius: "10px"
           }}>
             <h4>Resumo</h4>
-            {tools.length > 0 && <Pie data={chartData} />}
+            {tools.length > 0 && validCount + expiredCount > 0 && (
+              <Pie data={chartData} />
+            )}
+
           </div>
 
         </div>
@@ -342,7 +351,7 @@ export default function App() {
           )}
 
           {tools.map(t => {
-            const expiry = new Date(t.expiry_date);
+            const expiry = t.expiry_date ? new Date(t.expiry_date) : new Date();
             const expired = expiry < new Date();
 
             return (
