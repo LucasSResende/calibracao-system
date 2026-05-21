@@ -121,11 +121,12 @@ return (
     <h3>Ferramentas</h3>
 
 
-    {tools.length === 0 && (
+
+    {Array.isArray(tools) && tools.length === 0 && (
       <p>Nenhuma ferramenta cadastrada</p>
     )}
 
-    {tools && tools.length > 0 && tools.map(t => (
+    {Array.isArray(tools) && tools.map(t => (
       <div key={t.id}>
         {t.name} - {t.responsible} - {t.expiry_date}
       </div>
