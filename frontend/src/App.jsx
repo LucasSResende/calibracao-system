@@ -9,7 +9,6 @@ import { Pie } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-ChartJS.register(BarElement, CategoryScale, LinearScale);
 
 const API = "https://calibracao-system.onrender.com";
 
@@ -149,7 +148,6 @@ export default function App() {
       setSelectedTools([...selectedTools, id]);
     }
   };
-  ``
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -324,7 +322,7 @@ export default function App() {
             borderRadius: "10px"
           }}>
             <h4>Resumo</h4>
-            <Pie data={chartData} />
+            {tools.length > 0 && <Pie data={chartData} />}
           </div>
 
         </div>
