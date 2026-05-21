@@ -141,9 +141,11 @@ def list_tools(user: str = Depends(verify_token)):
             "entry_date": str(r[3]),
             "expiry_date": str(r[4])
         })
-        
+    
+    return result  # ✅ aqui dentro
+
+
 @app.get("/")
 def home():
     return {"status": "Backend online 🚀"}
 
-    return result

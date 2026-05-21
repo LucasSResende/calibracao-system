@@ -14,7 +14,6 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
-  // ✅ LOGIN
   const login = async () => {
     const formData = new URLSearchParams();
     formData.append("username", user);
@@ -33,18 +32,17 @@ export default function App() {
     if (data.access_token) {
       localStorage.setItem("token", data.access_token);
       setLogged(true);
+      loadTools();
     } else {
       alert("Erro login");
     }
   };
 
-  // ✅ LOGOUT (AQUI 👇)
   const logout = () => {
     localStorage.removeItem("token");
     setLogged(false);
   };
 
-  // ✅ CARREGAR TOOLS
   const loadTools = async () => {
     const token = localStorage.getItem("token");
 
@@ -55,15 +53,14 @@ export default function App() {
     });
 
     const data = await res.json();
+
     if (Array.isArray(data)) {
       setTools(data);
     } else {
-      console.error("Erro ao carregar tools:", data);
       setTools([]);
     }
   };
 
-  // ✅ ADD TOOL
   const addTool = async () => {
     const token = localStorage.getItem("token");
 
@@ -79,69 +76,53 @@ export default function App() {
 
     if (response.ok) {
       loadTools();
-    } else {
-      console.error("Erro ao adicionar");
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setLogged(true);
+      loadTools();
+    }
+  }, []);
 
-  loadTools();
-};
-
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    setLogged(true);
-    loadTools();
+  if (!logged) {
+    return (
+      <div>
+        <h2>Login</h2>
+        <input onChange={e => setUser(e.target.value)} placeholder="Usuário" />
+        <input onChange={e => setPass(e.target.value)} type="password" placeholder="Senha" />
+        <button onClick={login}>Entrar</button>
+      </div>
+    );
   }
-}, []);
 
-// ✅ LOGIN SCREEN
-if (!logged) {
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Login</h2>
-      <input placeholder="Usuário" onChange={e => setUser(e.target.value)} />
-      <br /><br />
-      <input type="password" placeholder="Senha" onChange={e => setPass(e.target.value)} />
-      <br /><br />
-      <button onClick={login}>Entrar</button>
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <strong>Usuário logado</strong>
+        <button onClick={logout}>Sair</button>
+      </div>
+
+      <h2>Sistema de Calibração</h2>
+
+      <input onChange={e => setName(e.target.value)} placeholder="Nome" />
+      <input onChange={e => setResponsible(e.target.value)} placeholder="Responsável" />
+      <input onChange={e => setDate(e.target.value)} type="date" />
+      <input onChange={e => setMonths(e.target.value)} placeholder="Meses" />
+
+      <button onClick={addTool}>Adicionar</button>
+
+      <h3>Ferramentas</h3>
+
+      {tools.length === 0 && <p>Nenhuma ferramenta cadastrada</p>}
+
+      {tools.map(t => (
+        <div key={t.id}>
+          {t.name} - {t.responsible} - {t.expiry_date}
+        </div>
+      ))}
     </div>
   );
 }
-
-// ✅ SISTEMA (LOGADO)
-return (
-  <div style={{ padding: "20px" }}>
-
-    {/* ✅ TOPO COM USUÁRIO + LOGOUT */}
-    <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <p><strong>Usuário logado</strong></p>
-      <button onClick={logout}>Sair</button>
-    </div>
-
-    <h2>Sistema de Calibração</h2>
-
-    <input placeholder="Nome" onChange={e => setName(e.target.value)} />
-    <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} />
-    <input type="date" onChange={e => setDate(e.target.value)} />
-    <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
-
-    <button onClick={addTool}>Adicionar</button>
-
-    <h3>Ferramentas</h3>
-
-
-
-    {Array.isArray(tools) && tools.length === 0 && (
-      <p>Nenhuma ferramenta cadastrada</p>
-    )}
-
-    {Array.isArray(tools) && tools.map(t => (
-      <div key={t.id}>
-        {t.name} - {t.responsible} - {t.expiry_date}
-      </div>
-    ))}
-  </div>
-);
-
