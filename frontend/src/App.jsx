@@ -133,7 +133,7 @@ export default function App() {
     return (
       <div style={{
         height: "100vh",
-        width: "100vw",
+        width: "100%",
         backgroundImage: "url('https://images.unsplash.com/photo-1528184039930-bd03972bd974')",
         backgroundSize: "cover",
         backgroundPosition: "center",
