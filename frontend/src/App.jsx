@@ -9,7 +9,6 @@ import { Pie } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-
 const API = "https://calibracao-system.onrender.com";
 
 export default function App() {
@@ -24,13 +23,8 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
-  const [selectedTools, setSelectedTools] = useState([]);
-  const [deleteMode, setDeleteMode] = useState(false);
-
-
+  // LOGIN
   const login = async () => {
-    console.log("clicou login");
-
     const formData = new URLSearchParams();
     formData.append("username", user);
     formData.append("password", pass);
@@ -41,11 +35,9 @@ export default function App() {
         "Content-Type": "application/x-www-form-urlencoded"
       },
       body: formData.toString()
-
     });
 
     const data = await res.json();
-    console.log("resposta backend:", data);
 
     if (data.access_token) {
       localStorage.setItem("token", data.access_token);
@@ -56,11 +48,13 @@ export default function App() {
     }
   };
 
+  // LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
     setLogged(false);
   };
 
+  // LOAD TOOLS
   const loadTools = async () => {
     const token = localStorage.getItem("token");
 
@@ -79,6 +73,7 @@ export default function App() {
     }
   };
 
+  // ADD TOOL
   const addTool = async () => {
     const token = localStorage.getItem("token");
 
@@ -97,58 +92,7 @@ export default function App() {
     }
   };
 
-  const deleteSelected = async () => {
-    if (selectedTools.length === 0) {
-      alert("Selecione pelo menos um item");
-      return;
-    }
-
-    const confirmar = window.confirm("Deseja apagar os itens selecionados?");
-    if (!confirmar) return;
-
-    const token = localStorage.getItem("token");
-
-    try {
-      for (const id of selectedTools) {
-        console.log("deletando:", id);
-
-        const res = await fetch(`${API}/tools/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        console.log("status:", res.status);
-
-        if (!res.ok) {
-          const error = await res.text();
-          console.error("erro backend:", error);
-          alert("Erro ao deletar item: " + id);
-          return;
-        }
-      }
-
-      alert("Itens deletados com sucesso ✅");
-
-      setSelectedTools([]);
-      setDeleteMode(false);
-      await loadTools(); // ✅ importante usar await
-
-    } catch (err) {
-      console.error("erro geral:", err);
-      alert("Erro na conexão com backend");
-    }
-  };
-
-  const toggleSelect = (id) => {
-    if (selectedTools.includes(id)) {
-      setSelectedTools(selectedTools.filter(t => t !== id));
-    } else {
-      setSelectedTools([...selectedTools, id]);
-    }
-  };
-
+  // AUTH
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -157,6 +101,7 @@ export default function App() {
     }
   }, []);
 
+  // LOGIN SCREEN
   if (!logged) {
     return (
       <div style={{
@@ -192,33 +137,11 @@ export default function App() {
           />
           <br /><br />
 
-          <button
-            onClick={login}
-            style={{
-              backgroundColor: "#2563eb",
-              color: "white",
-              border: "none",
-              padding: "10px",
-              width: "100%",
-              borderRadius: "5px"
-            }}
-          >
-            Entrar
-          </button>
+          <button onClick={login}>Entrar</button>
         </div>
       </div>
     );
   }
-
-  const validCount = tools.filter(t => {
-    if (!t.expiry_date) return false;
-    return new Date(t.expiry_date) >= new Date();
-  }).length;
-
-  const expiredCount = tools.filter(t => {
-    if (!t.expiry_date) return false;
-    return new Date(t.expiry_date) < new Date();
-  }).length;
 
   const validCount = Array.isArray(tools)
     ? tools.filter(t => t.expiry_date && new Date(t.expiry_date) >= new Date()).length
@@ -228,6 +151,16 @@ export default function App() {
     ? tools.filter(t => t.expiry_date && new Date(t.expiry_date) < new Date()).length
     : 0;
 
+  const chartData = {
+    labels: ["Em dia", "Vencidas"],
+    datasets: [
+      {
+        data: [validCount, expiredCount],
+        backgroundColor: ["#22c55e", "#ef4444"]
+      }
+    ]
+  };
+
   return (
     <div style={{
       display: "flex",
@@ -235,7 +168,7 @@ export default function App() {
       fontFamily: "Arial"
     }}>
 
-      {/* MENU LATERAL */}
+      {/* MENU */}
       <div style={{
         width: "250px",
         backgroundColor: "#1e3a8a",
@@ -243,10 +176,10 @@ export default function App() {
         padding: "20px"
       }}>
         <h2>⚓ Sistema</h2>
-        <p style={{ marginTop: "20px" }}>Dashboard</p>
+        <p>Dashboard</p>
       </div>
 
-      {/* CONTEÚDO */}
+      {/* CONTENT */}
       <div style={{
         flex: 1,
         background: "linear-gradient(to bottom, #e0f2fe, #f8fafc)",
@@ -254,35 +187,16 @@ export default function App() {
         overflowY: "auto"
       }}>
 
-        {/* TOPO DIREITO */}
-        <div style={{
-          display: "flex",
-          justifyContent: "flex-end"
-        }}>
-          <button
-            onClick={logout}
-            style={{
-              background: "none",
-              border: "none",
-              fontSize: "20px",
-              cursor: "pointer"
-            }}
-            title="Sair"
-          >
-            ⏻
-          </button>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button onClick={logout}>⏻</button>
         </div>
 
         <h2>Sistema de Calibração</h2>
 
         {/* GRID */}
-        <div style={{
-          display: "flex",
-          gap: "20px",
-          alignItems: "flex-start"
-        }}>
+        <div style={{ display: "flex", gap: "20px" }}>
 
-          {/* FORMULÁRIO */}
+          {/* FORM */}
           <div style={{
             flex: 1,
             background: "white",
@@ -303,22 +217,10 @@ export default function App() {
             <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
             <br /><br />
 
-            <button
-              onClick={addTool}
-              style={{
-                backgroundColor: "#2563eb",
-                color: "white",
-                border: "none",
-                padding: "10px",
-                borderRadius: "5px",
-                cursor: "pointer"
-              }}
-            >
-              ⚓ Adicionar
-            </button>
+            <button onClick={addTool}>Adicionar</button>
           </div>
 
-          {/* GRÁFICO */}
+          {/* CHART */}
           <div style={{
             width: "250px",
             background: "white",
@@ -326,19 +228,19 @@ export default function App() {
             borderRadius: "10px"
           }}>
             <h4>Resumo</h4>
-            {Array.isArray(tools) && tools.length > 0 ? (
+
+            {tools.length > 0 ? (
               <Pie data={chartData} />
             ) : (
-              <p>Sem dados para gráfico</p>
+              <p>Sem dados</p>
             )}
-
           </div>
 
         </div>
 
         <br />
 
-        {/* LISTA */}
+        {/* LIST */}
         <div style={{
           background: "white",
           padding: "20px",
@@ -361,17 +263,14 @@ export default function App() {
                   background: expired ? "#fee2e2" : "#dcfce7",
                   padding: "12px",
                   marginBottom: "10px",
-                  borderRadius: "6px",
-                  border: expired ? "1px solid red" : "1px solid green"
+                  borderRadius: "6px"
                 }}
               >
                 <strong>{t.name}</strong><br />
-                Responsável: {t.responsible}<br />
-                Expira em: {t.expiry_date}<br />
+                {t.responsible}<br />
+                {t.expiry_date}<br />
 
-                <span>
-                  {expired ? "🔴 VENCIDO" : "🟢 EM DIA"}
-                </span>
+                {expired ? "🔴 VENCIDO" : "🟢 OK"}
               </div>
             );
           })}
