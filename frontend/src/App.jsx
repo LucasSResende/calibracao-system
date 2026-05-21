@@ -55,75 +55,81 @@ export default function App() {
     });
 
     const data = await res.json();
-    setTools(data);
+    if (Array.isArray(data)) {
+      setTools(data);
+    } else {
+      console.error("Erro ao carregar tools:", data);
+      setTools([]);
+    }
   };
 
   // ✅ ADD TOOL
-  const addTool = async () => {
-    const token = localStorage.getItem("token");
+  c
+  const response = await fetch(...);
 
-    await fetch(
-      `${API}/tools?name=${name}&responsible=${responsible}&entry_date=${date}&months=${months}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
+  if (response.ok) {
     loadTools();
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setLogged(true);
-      loadTools();
-    }
-  }, []);
-
-  // ✅ LOGIN SCREEN
-  if (!logged) {
-    return (
-      <div style={{ padding: "20px" }}>
-        <h2>Login</h2>
-        <input placeholder="Usuário" onChange={e => setUser(e.target.value)} />
-        <br /><br />
-        <input type="password" placeholder="Senha" onChange={e => setPass(e.target.value)} />
-        <br /><br />
-        <button onClick={login}>Entrar</button>
-      </div>
-    );
+  } else {
+    console.error("Erro ao adicionar");
   }
 
-  // ✅ SISTEMA (LOGADO)
+
+  loadTools();
+};
+
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    setLogged(true);
+    loadTools();
+  }
+}, []);
+
+// ✅ LOGIN SCREEN
+if (!logged) {
   return (
     <div style={{ padding: "20px" }}>
-
-      {/* ✅ TOPO COM USUÁRIO + LOGOUT */}
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <p><strong>Usuário logado</strong></p>
-        <button onClick={logout}>Sair</button>
-      </div>
-
-      <h2>Sistema de Calibração</h2>
-
-      <input placeholder="Nome" onChange={e => setName(e.target.value)} />
-      <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} />
-      <input type="date" onChange={e => setDate(e.target.value)} />
-      <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
-
-      <button onClick={addTool}>Adicionar</button>
-
-      <h3>Ferramentas</h3>
-
-      {tools.map(t => (
-        <div key={t.id}>
-          {t.name} - {t.responsible} - {t.expiry_date}
-        </div>
-      ))}
-
+      <h2>Login</h2>
+      <input placeholder="Usuário" onChange={e => setUser(e.target.value)} />
+      <br /><br />
+      <input type="password" placeholder="Senha" onChange={e => setPass(e.target.value)} />
+      <br /><br />
+      <button onClick={login}>Entrar</button>
     </div>
   );
 }
+
+// ✅ SISTEMA (LOGADO)
+return (
+  <div style={{ padding: "20px" }}>
+
+    {/* ✅ TOPO COM USUÁRIO + LOGOUT */}
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <p><strong>Usuário logado</strong></p>
+      <button onClick={logout}>Sair</button>
+    </div>
+
+    <h2>Sistema de Calibração</h2>
+
+    <input placeholder="Nome" onChange={e => setName(e.target.value)} />
+    <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} />
+    <input type="date" onChange={e => setDate(e.target.value)} />
+    <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
+
+    <button onClick={addTool}>Adicionar</button>
+
+    <h3>Ferramentas</h3>
+
+
+    {tools.length === 0 && (
+      <p>Nenhuma ferramenta cadastrada</p>
+    )}
+
+    {tools && tools.length > 0 && tools.map(t => (
+      <div key={t.id}>
+        {t.name} - {t.responsible} - {t.expiry_date}
+      </div>
+    ))}
+  </div>
+);
+
