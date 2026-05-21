@@ -92,6 +92,20 @@ export default function App() {
     }
   };
 
+  const deleteTool = async (id) => {
+    const token = localStorage.getItem("token");
+
+    await fetch(`${API}/tools/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    loadTools();
+  };
+
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -175,7 +189,6 @@ export default function App() {
       fontFamily: "Arial"
     }}>
 
-      {/* 🌊 MENU LATERAL */}
       <div style={{
         width: "250px",
         backgroundColor: "#1e3a8a",
@@ -185,6 +198,21 @@ export default function App() {
         <h2>⚓ Sistema</h2>
 
         <p style={{ marginTop: "20px" }}>Usuário logado</p>
+
+        <button
+          onClick={() => deleteTool(t.id)}
+          style={{
+            marginTop: "5px",
+            background: "red",
+            color: "white",
+            border: "none",
+            padding: "5px",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          🗑️ Apagar
+        </button>
 
         <button
           onClick={logout}

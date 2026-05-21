@@ -149,3 +149,9 @@ def list_tools(user: str = Depends(verify_token)):
 def home():
     return {"status": "Backend online 🚀"}
 
+@app.delete("/tools/{tool_id}")
+def delete_tool(tool_id: str, user: str = Depends(verify_token)):
+    cursor.execute("DELETE FROM tools WHERE id=%s", (tool_id,))
+    conn.commit()
+
+    return {"msg": "Deletado"}
