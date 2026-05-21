@@ -24,6 +24,8 @@ export default function App() {
   const [months, setMonths] = useState("");
 
   const login = async () => {
+    console.log("clicou login");
+
     const formData = new URLSearchParams();
     formData.append("username", user);
     formData.append("password", pass);
