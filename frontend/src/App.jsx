@@ -35,10 +35,12 @@ export default function App() {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: formData
+      body: formData.toString()
+
     });
 
     const data = await res.json();
+    console.log("resposta backend:", data);
 
     if (data.access_token) {
       localStorage.setItem("token", data.access_token);
