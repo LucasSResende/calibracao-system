@@ -23,6 +23,10 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
+  const [selectedTools, setSelectedTools] = useState([]);
+  const [deleteMode, setDeleteMode] = useState(false);
+
+
   const login = async () => {
     console.log("clicou login");
 
@@ -92,31 +96,39 @@ export default function App() {
     }
   };
 
-  const deleteTool = async (id) => {
+  const deleteSelected = async () => {
+    if (selectedTools.length === 0) {
+      alert("Selecione pelo menos um item");
+      return;
+    }
 
-    const confirmar = window.confirm("Tem certeza que deseja apagar essa ferramenta?");
-
+    const confirmar = window.confirm("Deseja apagar os itens selecionados?");
     if (!confirmar) return;
 
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`${API}/tools/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    console.log("resposta delete:", res);
-
-    if (res.ok) {
-      loadTools();
-    } else {
-      alert("Erro ao deletar");
+    for (let id of selectedTools) {
+      await fetch(`${API}/tools/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
     }
+
+    setSelectedTools([]);
+    setDeleteMode(false);
+    loadTools();
   };
 
-
+  const toggleSelect = (id) => {
+    if (selectedTools.includes(id)) {
+      setSelectedTools(selectedTools.filter(t => t !== id));
+    } else {
+      setSelectedTools([...selectedTools, id]);
+    }
+  };
+  ``
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -212,21 +224,6 @@ export default function App() {
         <p style={{ marginTop: "20px" }}>Usuário logado</p>
 
         <button
-          onClick={() => deleteTool(t.id)}
-          style={{
-            marginTop: "5px",
-            background: "red",
-            color: "white",
-            border: "none",
-            padding: "5px",
-            borderRadius: "5px",
-            cursor: "pointer"
-          }}
-        >
-          🗑️ Apagar
-        </button>
-
-        <button
           onClick={logout}
           style={{
             marginTop: "20px",
@@ -239,7 +236,7 @@ export default function App() {
             cursor: "pointer"
           }}
         >
-          Sair
+          Logout
         </button>
       </div>
 
@@ -311,6 +308,41 @@ export default function App() {
             <p>Nenhuma ferramenta cadastrada</p>
           )}
 
+          {/* BOTÃO PRINCIPAL */}
+          <div style={{ marginBottom: "10px" }}>
+            <button
+              onClick={() => setDeleteMode(!deleteMode)}
+              style={{
+                backgroundColor: "orange",
+                color: "white",
+                padding: "8px",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer"
+              }}
+            >
+              🗑️ {deleteMode ? "Cancelar" : "Modo deletar"}
+            </button>
+
+            {deleteMode && (
+              <button
+                onClick={deleteSelected}
+                style={{
+                  marginLeft: "10px",
+                  backgroundColor: "red",
+                  color: "white",
+                  padding: "8px",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer"
+                }}
+              >
+                ✅ Confirmar exclusão
+              </button>
+            )}
+          </div>
+
+          {/* LISTA */}
           {tools.map(t => {
             const today = new Date();
             const expiry = new Date(t.expiry_date);
@@ -324,6 +356,15 @@ export default function App() {
                 borderRadius: "6px",
                 border: expired ? "1px solid red" : "1px solid green"
               }}>
+
+                {deleteMode && (
+                  <input
+                    type="checkbox"
+                    checked={selectedTools.includes(t.id)}
+                    onChange={() => toggleSelect(t.id)}
+                  />
+                )}
+
                 <strong>{t.name}</strong><br />
                 Responsável: {t.responsible}<br />
                 Expira em: {t.expiry_date}<br />
@@ -331,12 +372,6 @@ export default function App() {
                 <span style={{ fontWeight: "bold" }}>
                   {expired ? "🔴 VENCIDO" : "🟢 EM DIA"}
                 </span>
-
-                <br />
-
-                <button onClick={() => deleteTool(t.id)}>
-                  🗑️ Apagar
-                </button>
               </div>
             );
           })}
