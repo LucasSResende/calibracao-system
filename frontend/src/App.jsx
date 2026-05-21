@@ -172,10 +172,14 @@ export default function App() {
   return (
     <div style={{
       minHeight: "100vh",
+      width: "100%",
       background: "#0f172a",
       color: "white",
-      fontSize: 12
+      fontSize: 12,
+      display: "flex",
+      flexDirection: "column"
     }}>
+
       {/* TOPO */}
       <div style={{
         display: "flex",
@@ -202,10 +206,20 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ padding: 20 }}>
+      <div style={{
+        padding: 20,
+        width: "100%",
+        maxWidth: "100%"
+      }}>
 
         {/* FORM + CHART */}
-        <div style={{ display: "flex", gap: 20 }}>
+        <div style={{
+          display: "flex",
+          gap: 20,
+          width: "100%",
+          justifyContent: "space-between",
+          alignItems: "flex-start"
+        }}>
 
           <div>
             <h4>Cadastro</h4>
@@ -231,8 +245,10 @@ export default function App() {
 
         <div style={{
           background: "#1e293b",
-          padding: 10
+          padding: 10,
+          width: "100%"
         }}>
+
           {tools.map(t => {
             const expired = new Date(t.expiry_date) < new Date();
 
