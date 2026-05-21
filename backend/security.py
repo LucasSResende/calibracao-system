@@ -1,13 +1,7 @@
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import hashlib
 
 def hash_password(password: str):
-    password = password.strip()   # ✅ remove espaços
-    password = password[:72]      # ✅ evita erro do bcrypt
-    return pwd_context.hash(password)
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def verify_password(plain_password, hashed_password):
-    plain_password = plain_password.strip()
-    plain_password = plain_password[:72]
-    return pwd_context.verify(plain_password, hashed_password)
+    return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
