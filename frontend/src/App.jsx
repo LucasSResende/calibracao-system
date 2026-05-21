@@ -14,128 +14,94 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
-  // ✅ LOGIN
   const login = async () => {
-    try {
-      const formData = new URLSearchParams();
-      formData.append("username", user);
-      formData.append("password", pass);
-      formData.append("grant_type", "password"); // ✅ IMPORTANTE
+    const formData = new URLSearchParams();
+    formData.append("username", user);
+    formData.append("password", pass);
 
-      const res = await fetch("https://calibracao-system.onrender.com/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: formData.toString()
-      });
+    const res = await fetch(`${API}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: formData
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      console.log(data); // ✅ ver o erro real
-
-      if (res.ok && data.access_token) {
-        localStorage.setItem("token", data.access_token);
-        setLogged(true);
-        loadTools();
-      } else {
-        alert("Erro login: " + JSON.stringify(data));
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao conectar backend");
+    if (data.access_token) {
+      localStorage.setItem("token", data.access_token);
+      setLogged(true);
+    } else {
+      alert("Erro login");
     }
   };
 
+  const loadTools = async () => {
+    const token = localStorage.getItem("token");
 
-  const data = await res.json();
-
-  if (data.access_token) {
-    localStorage.setItem("token", data.access_token);
-    setLogged(true);
-    loadTools();
-  } else {
-    alert("Erro login");
-  }
-};
-
-// ✅ CARREGAR FERRAMENTAS
-const loadTools = async () => {
-  const token = localStorage.getItem("token");
-
-  const res = await fetch(`${API}/tools`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
-
-  const data = await res.json();
-  setTools(data);
-};
-
-// ✅ ADICIONAR FERRAMENTA
-const addTool = async () => {
-  const token = localStorage.getItem("token");
-
-  await fetch(
-    `${API}/tools?name=${name}&responsible=${responsible}&entry_date=${date}&months=${months}`,
-    {
-      method: "POST",
+    const res = await fetch(`${API}/tools`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
-    }
-  );
+    });
 
-  loadTools();
-};
+    const data = await res.json();
+    setTools(data);
+  };
 
-// ✅ MANTER LOGIN
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    setLogged(true);
+  const addTool = async () => {
+    const token = localStorage.getItem("token");
+
+    await fetch(
+      `${API}/tools?name=${name}&responsible=${responsible}&entry_date=${date}&months=${months}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
     loadTools();
-  }
-}, []);
+  };
 
-// ✅ TELA LOGIN
-if (!logged) {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setLogged(true);
+      loadTools();
+    }
+  }, []);
+
+  if (!logged) {
+    return (
+      <div>
+        <h2>Login</h2>
+        <input onChange={e => setUser(e.target.value)} placeholder="Usuário" />
+        <input onChange={e => setPass(e.target.value)} type="password" placeholder="Senha" />
+        <button onClick={login}>Entrar</button>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Login</h2>
-      <input placeholder="Usuário" onChange={e => setUser(e.target.value)} />
-      <br /><br />
-      <input
-        type="password"
-        placeholder="Senha"
-        onChange={e => setPass(e.target.value)}
-      />
-      <br /><br />
-      <button onClick={login}>Entrar</button>
+    <div>
+      <h2>Sistema de Calibração</h2>
+
+      <input onChange={e => setName(e.target.value)} placeholder="Nome" />
+      <input onChange={e => setResponsible(e.target.value)} placeholder="Responsável" />
+      <input onChange={e => setDate(e.target.value)} type="date" />
+      <input onChange={e => setMonths(e.target.value)} placeholder="Meses" />
+
+      <button onClick={addTool}>Adicionar</button>
+
+      {tools.map(t => (
+        <div key={t.id}>
+          {t.name} - {t.responsible} - {t.expiry_date}
+        </div>
+      ))}
     </div>
   );
 }
-
-// ✅ TELA PRINCIPAL
-return (
-  <div style={{ padding: "20px" }}>
-    <h2>Sistema de Calibração</h2>
-
-    <input placeholder="Nome" onChange={e => setName(e.target.value)} />
-    <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} />
-    <input type="date" onChange={e => setDate(e.target.value)} />
-    <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
-
-    <button onClick={addTool}>Adicionar</button>
-
-    <h3>Ferramentas</h3>
-
-    {tools.map(t => (
-      <div key={t.id}>
-        {t.name} - {t.responsible} - {t.expiry_date}
-      </div>
-    ))}
-  </div>
-);
+``
