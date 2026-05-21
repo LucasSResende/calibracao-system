@@ -1,4 +1,13 @@
 import { useState, useEffect } from "react";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+
+ChartJS.register(BarElement, CategoryScale, LinearScale);
 
 const API = "https://calibracao-system.onrender.com";
 
@@ -140,6 +149,20 @@ export default function App() {
     );
   }
 
+  const validCount = tools.filter(t => new Date(t.expiry_date) >= new Date()).length;
+  const expiredCount = tools.filter(t => new Date(t.expiry_date) < new Date()).length;
+
+  const chartData = {
+    labels: ["Em dia", "Vencidas"],
+    datasets: [
+      {
+        label: "Status das ferramentas",
+        data: [validCount, expiredCount],
+        backgroundColor: ["green", "red"]
+      }
+    ]
+  };
+
 
   return (
     <div style={{
@@ -176,7 +199,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* 📊 CONTEÚDO PRINCIPAL */}
       <div style={{
         flex: 1,
         backgroundImage:
@@ -190,6 +212,12 @@ export default function App() {
           borderRadius: "10px"
         }}>
           <h2>Sistema de Calibração</h2>
+
+          <h3>📊 Resumo</h3>
+          <div style={{ background: "white", padding: "10px", borderRadius: "10px" }}>
+            <Bar data={chartData} />
+          </div>
+          <br />
 
           {/* FORMULÁRIO */}
           <div style={{ marginBottom: "20px" }}>
@@ -239,22 +267,32 @@ export default function App() {
             <p>Nenhuma ferramenta cadastrada</p>
           )}
 
-          {tools.map(t => (
-            <div
-              key={t.id}
-              style={{
-                background: "#f0f9ff",
-                padding: "10px",
-                marginBottom: "10px",
-                borderRadius: "5px",
-                border: "1px solid #bae6fd"
-              }}
-            >
-              <strong>{t.name}</strong><br />
-              Responsável: {t.responsible}<br />
-              Expira em: {t.expiry_date}
-            </div>
-          ))}
+          {tools.map(t => {
+            const today = new Date();
+            const expiry = new Date(t.expiry_date);
+            const expired = expiry < today;
+
+            return (
+              <div
+                key={t.id}
+                style={{
+                  background: expired ? "#fee2e2" : "#dcfce7",
+                  padding: "12px",
+                  marginBottom: "10px",
+                  borderRadius: "6px",
+                  border: expired ? "1px solid red" : "1px solid green"
+                }}
+              >
+                <strong>{t.name}</strong><br />
+                Responsável: {t.responsible}<br />
+                Expira em: {t.expiry_date}<br />
+
+                <span style={{ fontWeight: "bold" }}>
+                  {expired ? "🔴 VENCIDO" : "🟢 EM DIA"}
+                </span>
+              </div>
+            );
+          })}
 
         </div>
       </div>
