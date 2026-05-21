@@ -23,10 +23,6 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
-  const [selectedTools, setSelectedTools] = useState([]);
-  const [deleteMode, setDeleteMode] = useState(false);
-
-  // LOGIN
   const login = async () => {
     const formData = new URLSearchParams();
     formData.append("username", user);
@@ -56,7 +52,6 @@ export default function App() {
     setLogged(false);
   };
 
-  // LOAD TOOLS
   const loadTools = async () => {
     const token = localStorage.getItem("token");
 
@@ -70,7 +65,6 @@ export default function App() {
     setTools(Array.isArray(data) ? data : []);
   };
 
-  // ADD TOOL
   const addTool = async () => {
     const token = localStorage.getItem("token");
 
@@ -87,40 +81,6 @@ export default function App() {
     loadTools();
   };
 
-  // DELETE SELECIONADOS ✅
-  const deleteSelected = async () => {
-    if (selectedTools.length === 0) {
-      alert("Selecione itens para excluir");
-      return;
-    }
-
-    if (!window.confirm("Confirmar exclusão?")) return;
-
-    const token = localStorage.getItem("token");
-
-    for (const id of selectedTools) {
-      await fetch(`${API}/tools/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-    }
-
-    setSelectedTools([]);
-    setDeleteMode(false);
-    loadTools();
-  };
-
-  // SELEÇÃO CHECKBOX
-  const toggleSelect = (id) => {
-    setSelectedTools(prev =>
-      prev.includes(id)
-        ? prev.filter(x => x !== id)
-        : [...prev, id]
-    );
-  };
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -129,93 +89,106 @@ export default function App() {
     }
   }, []);
 
-  // LOGIN SCREEN
+  // LOGIN
   if (!logged) {
     return (
       <div style={{
         height: "100vh",
-        background: "#e0f2fe",
+        backgroundImage: "url('https://images.unsplash.com/photo-1528184039930-bd03972bd974')",
+        backgroundSize: "cover",
         display: "flex",
         alignItems: "center",
         justifyContent: "center"
       }}>
         <div style={{
-          background: "white",
+          background: "rgba(0,0,50,0.85)",
           padding: 30,
           borderRadius: 10,
-          width: 300
+          color: "white",
+          width: 280,
+          textAlign: "center",
+          boxShadow: "0px 4px 15px rgba(0,0,0,0.8)"
         }}>
-          <h2>⚓ Login</h2>
+          <h2>⚓ Login Naval</h2>
 
-          <input placeholder="Usuário" onChange={e => setUser(e.target.value)} />
-          <br /><br />
-          <input type="password" placeholder="Senha" onChange={e => setPass(e.target.value)} />
-          <br /><br />
+          <input
+            placeholder="Usuário"
+            onChange={e => setUser(e.target.value)}
+            style={{ width: "100%", padding: 6 }}
+          /><br /><br />
 
-          <button onClick={login}>Entrar</button>
+          <input
+            type="password"
+            placeholder="Senha"
+            onChange={e => setPass(e.target.value)}
+            style={{ width: "100%", padding: 6 }}
+          /><br /><br />
+
+          <button onClick={login} style={{
+            background: "#1e40af",
+            color: "white",
+            padding: 8,
+            border: "none",
+            width: "100%"
+          }}>
+            Entrar
+          </button>
         </div>
       </div>
     );
   }
 
-  // CHART
+  // GRÁFICO
   const validCount = tools.filter(t => new Date(t.expiry_date) >= new Date()).length;
   const expiredCount = tools.filter(t => new Date(t.expiry_date) < new Date()).length;
 
   const chartData = {
-    labels: ["Em dia", "Vencidas"],
+    labels: ["OK", "Vencidos"],
     datasets: [
       {
         data: [validCount, expiredCount],
-        backgroundColor: ["#22c55e", "#ef4444"]
+        backgroundColor: ["#22c55e", "#dc2626"]
       }
     ]
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial" }}>
-
-      {/* MENU */}
+    <div style={{
+      minHeight: "100vh",
+      background: "#0f172a",
+      color: "white",
+      fontSize: 12,
+      fontFamily: "Arial"
+    }}>
+      {/* TOPO */}
       <div style={{
-        width: 220,
-        background: "#1e3a8a",
-        color: "white",
-        padding: 20
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "10px 20px",
+        borderBottom: "1px solid #334155"
       }}>
-        <h2>⚓ Sistema</h2>
+        <strong>⚓ Sistema Naval</strong>
+        <button onClick={logout} style={{
+          background: "none",
+          color: "white",
+          border: "none"
+        }}>
+          Logout ⏻
+        </button>
       </div>
 
-      {/* CONTEÚDO */}
-      <div style={{ flex: 1, padding: 20, background: "#f1f5f9" }}>
+      <div style={{ padding: 20 }}>
 
-        {/* TOPO */}
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-          <button onClick={() => setDeleteMode(!deleteMode)}>
-            🗑️ {deleteMode ? "Cancelar" : "Excluir"}
-          </button>
-
-          {deleteMode && (
-            <button onClick={deleteSelected} style={{ background: "red", color: "white" }}>
-              Confirmar
-            </button>
-          )}
-
-          <button onClick={logout}>
-            Logout ⏻
-          </button>
-        </div>
-
-        <h2>Sistema de Calibração</h2>
-
-        {/* GRID */}
+        {/* FORM + CHART */}
         <div style={{ display: "flex", gap: 20 }}>
-          <div style={{ flex: 1 }}>
-            <h3>Adicionar ferramenta</h3>
 
-            <input placeholder="Nome" onChange={e => setName(e.target.value)} /><br /><br />
-            <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} /><br /><br />
-            <input type="date" onChange={e => setDate(e.target.value)} /><br /><br />
-            <input placeholder="Meses" onChange={e => setMonths(e.target.value)} /><br /><br />
+          <div>
+            <h4>Cadastro</h4>
+
+            <input placeholder="Nome" onChange={e => setName(e.target.value)} /><br />
+            <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} /><br />
+            <input type="date" onChange={e => setDate(e.target.value)} /><br />
+            <input placeholder="Meses" onChange={e => setMonths(e.target.value)} /><br />
 
             <button onClick={addTool}>Adicionar</button>
           </div>
@@ -223,38 +196,40 @@ export default function App() {
           <div style={{ width: 200 }}>
             {tools.length > 0 && <Pie data={chartData} />}
           </div>
+
         </div>
 
         <br />
 
         {/* LISTA */}
-        <h3>Ferramentas</h3>
+        <h4>Ferramentas</h4>
 
-        {tools.map(t => {
-          const expired = new Date(t.expiry_date) < new Date();
+        <div style={{
+          background: "#1e293b",
+          padding: 10,
+          borderRadius: 5
+        }}>
+          {tools.map((t) => {
+            const expired = new Date(t.expiry_date) < new Date();
 
-          return (
-            <div key={t.id} style={{
-              background: "white",
-              padding: 10,
-              marginBottom: 10,
-              borderLeft: `5px solid ${expired ? "red" : "green"}`
-            }}>
-              {deleteMode && (
-                <input
-                  type="checkbox"
-                  checked={selectedTools.includes(t.id)}
-                  onChange={() => toggleSelect(t.id)}
-                />
-              )}
+            return (
+              <div key={t.id} style={{
+                display: "flex",
+                justifyContent: "space-between",
+                borderBottom: "1px solid #334155",
+                padding: "6px 0"
+              }}>
+                <span>{t.name}</span>
+                <span>{t.responsible}</span>
+                <span>{t.expiry_date}</span>
+                <span style={{ color: expired ? "red" : "lightgreen" }}>
+                  {expired ? "VENCIDO" : "OK"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
 
-              <strong>{t.name}</strong><br />
-              {t.responsible}<br />
-              {t.expiry_date}<br />
-              {expired ? "🔴 VENCIDO" : "🟢 OK"}
-            </div>
-          );
-        })}
       </div>
     </div>
   );
