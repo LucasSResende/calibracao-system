@@ -152,9 +152,14 @@ def home():
 @app.delete("/tools/{tool_id}")
 def delete_tool(tool_id: str, user: str = Depends(verify_token)):
     try:
-        cursor.execute("DELETE FROM tools WHERE id=%s::uuid", (tool_id,))
+        cursor.execute(
+            "DELETE FROM tools WHERE id = %s::uuid",  # ✅ conversão correta
+            (tool_id,)
+        )
         conn.commit()
+
         return {"msg": "Deletado"}
+
     except Exception as e:
         print("ERRO DELETE:", e)
         raise HTTPException(status_code=500, detail=str(e))
