@@ -1,7 +1,6 @@
 import psycopg2
+import os
 
-conn = psycopg2.connect(
-    "postgresql://postgres.rurlaawrltoddeascnqy:Okaiomandarim7&!@aws-1-sa-east-1.pooler.supabase.com:6543/postgres"
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-cursor = conn.cursor()
+conn = psycopg2.connect(DATABASE_URL)
