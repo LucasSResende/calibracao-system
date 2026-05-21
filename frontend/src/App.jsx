@@ -14,6 +14,7 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
+  // ✅ LOGIN
   const login = async () => {
     const formData = new URLSearchParams();
     formData.append("username", user);
@@ -37,6 +38,13 @@ export default function App() {
     }
   };
 
+  // ✅ LOGOUT (AQUI 👇)
+  const logout = () => {
+    localStorage.removeItem("token");
+    setLogged(false);
+  };
+
+  // ✅ CARREGAR TOOLS
   const loadTools = async () => {
     const token = localStorage.getItem("token");
 
@@ -50,6 +58,7 @@ export default function App() {
     setTools(data);
   };
 
+  // ✅ ADD TOOL
   const addTool = async () => {
     const token = localStorage.getItem("token");
 
@@ -74,34 +83,47 @@ export default function App() {
     }
   }, []);
 
+  // ✅ LOGIN SCREEN
   if (!logged) {
     return (
-      <div>
+      <div style={{ padding: "20px" }}>
         <h2>Login</h2>
-        <input onChange={e => setUser(e.target.value)} placeholder="Usuário" />
-        <input onChange={e => setPass(e.target.value)} type="password" placeholder="Senha" />
+        <input placeholder="Usuário" onChange={e => setUser(e.target.value)} />
+        <br /><br />
+        <input type="password" placeholder="Senha" onChange={e => setPass(e.target.value)} />
+        <br /><br />
         <button onClick={login}>Entrar</button>
       </div>
     );
   }
 
+  // ✅ SISTEMA (LOGADO)
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
+
+      {/* ✅ TOPO COM USUÁRIO + LOGOUT */}
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <p><strong>Usuário logado</strong></p>
+        <button onClick={logout}>Sair</button>
+      </div>
+
       <h2>Sistema de Calibração</h2>
 
-      <input onChange={e => setName(e.target.value)} placeholder="Nome" />
-      <input onChange={e => setResponsible(e.target.value)} placeholder="Responsável" />
-      <input onChange={e => setDate(e.target.value)} type="date" />
-      <input onChange={e => setMonths(e.target.value)} placeholder="Meses" />
+      <input placeholder="Nome" onChange={e => setName(e.target.value)} />
+      <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} />
+      <input type="date" onChange={e => setDate(e.target.value)} />
+      <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
 
       <button onClick={addTool}>Adicionar</button>
+
+      <h3>Ferramentas</h3>
 
       {tools.map(t => (
         <div key={t.id}>
           {t.name} - {t.responsible} - {t.expiry_date}
         </div>
       ))}
+
     </div>
   );
 }
-``
