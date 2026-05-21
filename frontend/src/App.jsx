@@ -142,123 +142,121 @@ export default function App() {
 
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        fontFamily: "Arial",
-        padding: "30px"
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "rgba(255,255,255,0.9)",
-          padding: "20px",
-          borderRadius: "10px",
-          maxWidth: "600px",
-          margin: "auto"
-        }}
-      >
-        {/* 🔝 TOPO */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            backgroundColor: "#1e3a8a",
-            color: "white",
-            padding: "10px",
-            borderRadius: "5px"
-          }}
-        >
-          <strong>⚓ Sistema de Calibração</strong>
-          <button
-            onClick={logout}
-            style={{
-              background: "white",
-              color: "#1e3a8a",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            Sair
-          </button>
-        </div>
+    <div style={{
+      display: "flex",
+      height: "100vh",
+      fontFamily: "Arial"
+    }}>
 
-        <br />
+      {/* 🌊 MENU LATERAL */}
+      <div style={{
+        width: "250px",
+        backgroundColor: "#1e3a8a",
+        color: "white",
+        padding: "20px"
+      }}>
+        <h2>⚓ Sistema</h2>
 
-        {/* 📥 INPUTS */}
-        <input
-          placeholder="Nome"
-          onChange={(e) => setName(e.target.value)}
-        />
-        <br /><br />
-
-        <input
-          placeholder="Responsável"
-          onChange={(e) => setResponsible(e.target.value)}
-        />
-        <br /><br />
-
-        <input
-          type="date"
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <br /><br />
-
-        <input
-          placeholder="Meses"
-          onChange={(e) => setMonths(e.target.value)}
-        />
-        <br /><br />
+        <p style={{ marginTop: "20px" }}>Usuário logado</p>
 
         <button
-          onClick={addTool}
+          onClick={logout}
           style={{
-            backgroundColor: "#2563eb",
-            color: "white",
+            marginTop: "20px",
+            background: "white",
+            color: "#1e3a8a",
             border: "none",
             padding: "10px",
             borderRadius: "5px",
-            cursor: "pointer",
-            width: "100%"
+            width: "100%",
+            cursor: "pointer"
           }}
         >
-          ⚓ Adicionar Ferramenta
+          Sair
         </button>
+      </div>
 
-        <br /><br />
+      {/* 📊 CONTEÚDO PRINCIPAL */}
+      <div style={{
+        flex: 1,
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
+        backgroundSize: "cover",
+        padding: "30px"
+      }}>
+        <div style={{
+          background: "rgba(255,255,255,0.9)",
+          padding: "20px",
+          borderRadius: "10px"
+        }}>
+          <h2>Sistema de Calibração</h2>
 
-        {/* 📋 LISTA */}
-        <h3>Ferramentas</h3>
+          {/* FORMULÁRIO */}
+          <div style={{ marginBottom: "20px" }}>
+            <input
+              placeholder="Nome"
+              onChange={e => setName(e.target.value)}
+            />
+            <br /><br />
 
-        {tools.length === 0 && (
-          <p>Nenhuma ferramenta cadastrada</p>
-        )}
+            <input
+              placeholder="Responsável"
+              onChange={e => setResponsible(e.target.value)}
+            />
+            <br /><br />
 
-        {tools.map((t) => (
-          <div
-            key={t.id}
-            style={{
-              background: "#f0f9ff",
-              padding: "10px",
-              marginBottom: "10px",
-              borderRadius: "5px",
-              border: "1px solid #bae6fd"
-            }}
-          >
-            <strong>{t.name}</strong>
-            <br />
-            Responsável: {t.responsible}
-            <br />
-            Expira em: {t.expiry_date}
+            <input
+              type="date"
+              onChange={e => setDate(e.target.value)}
+            />
+            <br /><br />
+
+            <input
+              placeholder="Meses"
+              onChange={e => setMonths(e.target.value)}
+            />
+            <br /><br />
+
+            <button
+              onClick={addTool}
+              style={{
+                backgroundColor: "#2563eb",
+                color: "white",
+                border: "none",
+                padding: "10px",
+                borderRadius: "5px",
+                cursor: "pointer"
+              }}
+            >
+              ⚓ Adicionar Ferramenta
+            </button>
           </div>
-        ))}
+
+          {/* LISTA */}
+          <h3>Ferramentas</h3>
+
+          {tools.length === 0 && (
+            <p>Nenhuma ferramenta cadastrada</p>
+          )}
+
+          {tools.map(t => (
+            <div
+              key={t.id}
+              style={{
+                background: "#f0f9ff",
+                padding: "10px",
+                marginBottom: "10px",
+                borderRadius: "5px",
+                border: "1px solid #bae6fd"
+              }}
+            >
+              <strong>{t.name}</strong><br />
+              Responsável: {t.responsible}<br />
+              Expira em: {t.expiry_date}
+            </div>
+          ))}
+
+        </div>
       </div>
     </div>
   );

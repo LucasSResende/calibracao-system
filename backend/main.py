@@ -63,7 +63,7 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
         username = form_data.username
-        password = form_data.password.strip()  # ✅ IMPORTANTE
+        password = form_data.password.strip()
 
         cursor.execute("SELECT * FROM users WHERE username=%s", (username,))
         user = cursor.fetchone()
@@ -142,7 +142,7 @@ def list_tools(user: str = Depends(verify_token)):
             "expiry_date": str(r[4])
         })
     
-    return result  # ✅ aqui dentro
+    return result
 
 
 @app.get("/")
