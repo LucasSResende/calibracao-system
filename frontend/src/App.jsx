@@ -23,6 +23,9 @@ export default function App() {
   const [date, setDate] = useState("");
   const [months, setMonths] = useState("");
 
+  const [selectedTools, setSelectedTools] = useState([]);
+  const [deleteMode, setDeleteMode] = useState(false);
+
   // LOGIN
   const login = async () => {
     const formData = new URLSearchParams();
@@ -48,7 +51,6 @@ export default function App() {
     }
   };
 
-  // LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
     setLogged(false);
@@ -65,19 +67,14 @@ export default function App() {
     });
 
     const data = await res.json();
-
-    if (Array.isArray(data)) {
-      setTools(data);
-    } else {
-      setTools([]);
-    }
+    setTools(Array.isArray(data) ? data : []);
   };
 
   // ADD TOOL
   const addTool = async () => {
     const token = localStorage.getItem("token");
 
-    const response = await fetch(
+    await fetch(
       `${API}/tools?name=${name}&responsible=${responsible}&entry_date=${date}&months=${months}`,
       {
         method: "POST",
@@ -87,12 +84,43 @@ export default function App() {
       }
     );
 
-    if (response.ok) {
-      loadTools();
-    }
+    loadTools();
   };
 
-  // AUTH
+  // DELETE SELECIONADOS ✅
+  const deleteSelected = async () => {
+    if (selectedTools.length === 0) {
+      alert("Selecione itens para excluir");
+      return;
+    }
+
+    if (!window.confirm("Confirmar exclusão?")) return;
+
+    const token = localStorage.getItem("token");
+
+    for (const id of selectedTools) {
+      await fetch(`${API}/tools/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
+
+    setSelectedTools([]);
+    setDeleteMode(false);
+    loadTools();
+  };
+
+  // SELEÇÃO CHECKBOX
+  const toggleSelect = (id) => {
+    setSelectedTools(prev =>
+      prev.includes(id)
+        ? prev.filter(x => x !== id)
+        : [...prev, id]
+    );
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -105,36 +133,23 @@ export default function App() {
   if (!logged) {
     return (
       <div style={{
-        minHeight: "100vh",
-        backgroundImage: "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        height: "100vh",
+        background: "#e0f2fe",
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        justifyContent: "center"
       }}>
         <div style={{
-          background: "rgba(255,255,255,0.9)",
-          padding: "30px",
-          borderRadius: "10px",
-          width: "300px",
-          textAlign: "center"
+          background: "white",
+          padding: 30,
+          borderRadius: 10,
+          width: 300
         }}>
           <h2>⚓ Login</h2>
 
-          <input
-            placeholder="Usuário"
-            onChange={e => setUser(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          />
+          <input placeholder="Usuário" onChange={e => setUser(e.target.value)} />
           <br /><br />
-
-          <input
-            type="password"
-            placeholder="Senha"
-            onChange={e => setPass(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          />
+          <input type="password" placeholder="Senha" onChange={e => setPass(e.target.value)} />
           <br /><br />
 
           <button onClick={login}>Entrar</button>
@@ -143,13 +158,9 @@ export default function App() {
     );
   }
 
-  const validCount = Array.isArray(tools)
-    ? tools.filter(t => t.expiry_date && new Date(t.expiry_date) >= new Date()).length
-    : 0;
-
-  const expiredCount = Array.isArray(tools)
-    ? tools.filter(t => t.expiry_date && new Date(t.expiry_date) < new Date()).length
-    : 0;
+  // CHART
+  const validCount = tools.filter(t => new Date(t.expiry_date) >= new Date()).length;
+  const expiredCount = tools.filter(t => new Date(t.expiry_date) < new Date()).length;
 
   const chartData = {
     labels: ["Em dia", "Vencidas"],
@@ -162,120 +173,88 @@ export default function App() {
   };
 
   return (
-    <div style={{
-      display: "flex",
-      minHeight: "100vh",
-      fontFamily: "Arial"
-    }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial" }}>
 
       {/* MENU */}
       <div style={{
-        width: "250px",
-        backgroundColor: "#1e3a8a",
+        width: 220,
+        background: "#1e3a8a",
         color: "white",
-        padding: "20px"
+        padding: 20
       }}>
         <h2>⚓ Sistema</h2>
-        <p>Dashboard</p>
       </div>
 
-      {/* CONTENT */}
-      <div style={{
-        flex: 1,
-        background: "linear-gradient(to bottom, #e0f2fe, #f8fafc)",
-        padding: "30px",
-        overflowY: "auto"
-      }}>
+      {/* CONTEÚDO */}
+      <div style={{ flex: 1, padding: 20, background: "#f1f5f9" }}>
 
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={logout}>⏻</button>
+        {/* TOPO */}
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          <button onClick={() => setDeleteMode(!deleteMode)}>
+            🗑️ {deleteMode ? "Cancelar" : "Excluir"}
+          </button>
+
+          {deleteMode && (
+            <button onClick={deleteSelected} style={{ background: "red", color: "white" }}>
+              Confirmar
+            </button>
+          )}
+
+          <button onClick={logout}>
+            Logout ⏻
+          </button>
         </div>
 
         <h2>Sistema de Calibração</h2>
 
         {/* GRID */}
-        <div style={{ display: "flex", gap: "20px" }}>
-
-          {/* FORM */}
-          <div style={{
-            flex: 1,
-            background: "white",
-            padding: "20px",
-            borderRadius: "10px"
-          }}>
+        <div style={{ display: "flex", gap: 20 }}>
+          <div style={{ flex: 1 }}>
             <h3>Adicionar ferramenta</h3>
 
-            <input placeholder="Nome" onChange={e => setName(e.target.value)} />
-            <br /><br />
-
-            <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} />
-            <br /><br />
-
-            <input type="date" onChange={e => setDate(e.target.value)} />
-            <br /><br />
-
-            <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
-            <br /><br />
+            <input placeholder="Nome" onChange={e => setName(e.target.value)} /><br /><br />
+            <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} /><br /><br />
+            <input type="date" onChange={e => setDate(e.target.value)} /><br /><br />
+            <input placeholder="Meses" onChange={e => setMonths(e.target.value)} /><br /><br />
 
             <button onClick={addTool}>Adicionar</button>
           </div>
 
-          {/* CHART */}
-          <div style={{
-            width: "250px",
-            background: "white",
-            padding: "10px",
-            borderRadius: "10px"
-          }}>
-            <h4>Resumo</h4>
-
-            {tools.length > 0 ? (
-              <Pie data={chartData} />
-            ) : (
-              <p>Sem dados</p>
-            )}
+          <div style={{ width: 200 }}>
+            {tools.length > 0 && <Pie data={chartData} />}
           </div>
-
         </div>
 
         <br />
 
-        {/* LIST */}
-        <div style={{
-          background: "white",
-          padding: "20px",
-          borderRadius: "10px"
-        }}>
-          <h3>Ferramentas</h3>
+        {/* LISTA */}
+        <h3>Ferramentas</h3>
 
-          {tools.length === 0 && (
-            <p>Nenhuma ferramenta cadastrada</p>
-          )}
+        {tools.map(t => {
+          const expired = new Date(t.expiry_date) < new Date();
 
-          {Array.isArray(tools) && tools.map(t => {
-            const expiry = t.expiry_date ? new Date(t.expiry_date) : new Date();
-            const expired = expiry < new Date();
+          return (
+            <div key={t.id} style={{
+              background: "white",
+              padding: 10,
+              marginBottom: 10,
+              borderLeft: `5px solid ${expired ? "red" : "green"}`
+            }}>
+              {deleteMode && (
+                <input
+                  type="checkbox"
+                  checked={selectedTools.includes(t.id)}
+                  onChange={() => toggleSelect(t.id)}
+                />
+              )}
 
-            return (
-              <div
-                key={t.id}
-                style={{
-                  background: expired ? "#fee2e2" : "#dcfce7",
-                  padding: "12px",
-                  marginBottom: "10px",
-                  borderRadius: "6px"
-                }}
-              >
-                <strong>{t.name}</strong><br />
-                {t.responsible}<br />
-                {t.expiry_date}<br />
-
-                {expired ? "🔴 VENCIDO" : "🟢 OK"}
-              </div>
-            );
-          })}
-        </div>
-
+              <strong>{t.name}</strong><br />
+              {t.responsible}<br />
+              {t.expiry_date}<br />
+              {expired ? "🔴 VENCIDO" : "🟢 OK"}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
