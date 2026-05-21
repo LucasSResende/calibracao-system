@@ -7,6 +7,12 @@ from security import hash_password, verify_password
 from jose import jwt
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
 
 app = FastAPI()
 
@@ -83,18 +89,27 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 # CADASTRAR USUÁRIO
+
 @app.post("/register")
-def register(username: str, password: str):
+def register(user: UserCreate):
+    try:
+        username = user.username
+        password = user.password
 
-    hashed = hash_password(password)
+        hashed = hash_password(password)
 
-    cursor.execute(
-        "INSERT INTO users (username, password) VALUES (%s,%s)",
-        (username, hashed)
-    )
-    conn.commit()
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (%s,%s)",
+            (username, hashed)
+        )
+        conn.commit()
 
-    return {"msg": "Usuário criado"}
+        return {"msg": "Usuário criado"}
+
+    except Exception as e:
+        print("ERRO REGISTER:", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # CRIAR FERRAMENTA
 @app.post("/tools")
