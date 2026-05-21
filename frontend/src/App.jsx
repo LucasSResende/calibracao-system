@@ -107,18 +107,37 @@ export default function App() {
 
     const token = localStorage.getItem("token");
 
-    for (let id of selectedTools) {
-      await fetch(`${API}/tools/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-    }
+    try {
+      for (const id of selectedTools) {
+        console.log("deletando:", id);
 
-    setSelectedTools([]);
-    setDeleteMode(false);
-    loadTools();
+        const res = await fetch(`${API}/tools/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        console.log("status:", res.status);
+
+        if (!res.ok) {
+          const error = await res.text();
+          console.error("erro backend:", error);
+          alert("Erro ao deletar item: " + id);
+          return;
+        }
+      }
+
+      alert("Itens deletados com sucesso ✅");
+
+      setSelectedTools([]);
+      setDeleteMode(false);
+      await loadTools(); // ✅ importante usar await
+
+    } catch (err) {
+      console.error("erro geral:", err);
+      alert("Erro na conexão com backend");
+    }
   };
 
   const toggleSelect = (id) => {
