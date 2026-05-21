@@ -133,8 +133,11 @@ export default function App() {
     return (
       <div style={{
         height: "100vh",
+        width: "100vw",
         backgroundImage: "url('https://images.unsplash.com/photo-1528184039930-bd03972bd974')",
         backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
         display: "flex",
         alignItems: "center",
         justifyContent: "center"
@@ -172,12 +175,10 @@ export default function App() {
   return (
     <div style={{
       minHeight: "100vh",
-      width: "100%",
+      width: "100vw",
       background: "#0f172a",
-      color: "white",
-      fontSize: 12,
-      display: "flex",
-      flexDirection: "column"
+      margin: 0,
+      padding: 0
     }}>
 
       {/* TOPO */}
