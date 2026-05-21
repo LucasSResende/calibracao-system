@@ -220,15 +220,13 @@ export default function App() {
     return new Date(t.expiry_date) < new Date();
   }).length;
 
-  const chartData = {
-    labels: ["Em dia", "Vencidas"],
-    datasets: [
-      {
-        data: [validCount, expiredCount],
-        backgroundColor: ["#22c55e", "#ef4444"]
-      }
-    ]
-  };
+  const validCount = Array.isArray(tools)
+    ? tools.filter(t => t.expiry_date && new Date(t.expiry_date) >= new Date()).length
+    : 0;
+
+  const expiredCount = Array.isArray(tools)
+    ? tools.filter(t => t.expiry_date && new Date(t.expiry_date) < new Date()).length
+    : 0;
 
   return (
     <div style={{
@@ -328,8 +326,10 @@ export default function App() {
             borderRadius: "10px"
           }}>
             <h4>Resumo</h4>
-            {tools.length > 0 && validCount + expiredCount > 0 && (
+            {Array.isArray(tools) && tools.length > 0 ? (
               <Pie data={chartData} />
+            ) : (
+              <p>Sem dados para gráfico</p>
             )}
 
           </div>
@@ -350,7 +350,7 @@ export default function App() {
             <p>Nenhuma ferramenta cadastrada</p>
           )}
 
-          {tools.map(t => {
+          {Array.isArray(tools) && tools.map(t => {
             const expiry = t.expiry_date ? new Date(t.expiry_date) : new Date();
             const expired = expiry < new Date();
 
