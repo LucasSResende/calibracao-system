@@ -64,14 +64,25 @@ export default function App() {
   };
 
   // ✅ ADD TOOL
-  c
-  const response = await fetch(...);
+  const addTool = async () => {
+    const token = localStorage.getItem("token");
 
-  if (response.ok) {
-    loadTools();
-  } else {
-    console.error("Erro ao adicionar");
-  }
+    const response = await fetch(
+      `${API}/tools?name=${name}&responsible=${responsible}&entry_date=${date}&months=${months}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (response.ok) {
+      loadTools();
+    } else {
+      console.error("Erro ao adicionar");
+    }
+  };
 
 
   loadTools();
