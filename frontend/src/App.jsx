@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import {
   Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale
+  ArcElement,
+  Tooltip,
+  Legend
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 ChartJS.register(BarElement, CategoryScale, LinearScale);
 
@@ -213,25 +215,25 @@ export default function App() {
   const validCount = tools.filter(t => new Date(t.expiry_date) >= new Date()).length;
   const expiredCount = tools.filter(t => new Date(t.expiry_date) < new Date()).length;
 
+
   const chartData = {
     labels: ["Em dia", "Vencidas"],
     datasets: [
       {
-        label: "Status das ferramentas",
         data: [validCount, expiredCount],
-        backgroundColor: ["green", "red"]
+        backgroundColor: ["#22c55e", "#ef4444"]
       }
     ]
   };
 
-
   return (
     <div style={{
       display: "flex",
-      height: "100vh",
+      minHeight: "100vh",
       fontFamily: "Arial"
     }}>
 
+      {/* MENU LATERAL */}
       <div style={{
         width: "250px",
         backgroundColor: "#1e3a8a",
@@ -239,70 +241,64 @@ export default function App() {
         padding: "20px"
       }}>
         <h2>⚓ Sistema</h2>
-
-        <p style={{ marginTop: "20px" }}>Usuário logado</p>
-
-        <button
-          onClick={logout}
-          style={{
-            marginTop: "20px",
-            background: "white",
-            color: "#1e3a8a",
-            border: "none",
-            padding: "10px",
-            borderRadius: "5px",
-            width: "100%",
-            cursor: "pointer"
-          }}
-        >
-          Logout
-        </button>
+        <p style={{ marginTop: "20px" }}>Dashboard</p>
       </div>
 
+      {/* CONTEÚDO */}
       <div style={{
         flex: 1,
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
-        backgroundSize: "cover",
-        padding: "30px"
+        background: "linear-gradient(to bottom, #e0f2fe, #f8fafc)",
+        padding: "30px",
+        overflowY: "auto"
       }}>
-        <div style={{
-          background: "rgba(255,255,255,0.9)",
-          padding: "20px",
-          borderRadius: "10px"
-        }}>
-          <h2>Sistema de Calibração</h2>
 
-          <h3>📊 Resumo</h3>
-          <div style={{ background: "white", padding: "10px", borderRadius: "10px" }}>
-            <Bar data={chartData} />
-          </div>
-          <br />
+        {/* TOPO DIREITO */}
+        <div style={{
+          display: "flex",
+          justifyContent: "flex-end"
+        }}>
+          <button
+            onClick={logout}
+            style={{
+              background: "none",
+              border: "none",
+              fontSize: "20px",
+              cursor: "pointer"
+            }}
+            title="Sair"
+          >
+            ⏻
+          </button>
+        </div>
+
+        <h2>Sistema de Calibração</h2>
+
+        {/* GRID */}
+        <div style={{
+          display: "flex",
+          gap: "20px",
+          alignItems: "flex-start"
+        }}>
 
           {/* FORMULÁRIO */}
-          <div style={{ marginBottom: "20px" }}>
-            <input
-              placeholder="Nome"
-              onChange={e => setName(e.target.value)}
-            />
+          <div style={{
+            flex: 1,
+            background: "white",
+            padding: "20px",
+            borderRadius: "10px"
+          }}>
+            <h3>Adicionar ferramenta</h3>
+
+            <input placeholder="Nome" onChange={e => setName(e.target.value)} />
             <br /><br />
 
-            <input
-              placeholder="Responsável"
-              onChange={e => setResponsible(e.target.value)}
-            />
+            <input placeholder="Responsável" onChange={e => setResponsible(e.target.value)} />
             <br /><br />
 
-            <input
-              type="date"
-              onChange={e => setDate(e.target.value)}
-            />
+            <input type="date" onChange={e => setDate(e.target.value)} />
             <br /><br />
 
-            <input
-              placeholder="Meses"
-              onChange={e => setMonths(e.target.value)}
-            />
+            <input placeholder="Meses" onChange={e => setMonths(e.target.value)} />
             <br /><br />
 
             <button
@@ -316,86 +312,64 @@ export default function App() {
                 cursor: "pointer"
               }}
             >
-              ⚓ Adicionar Ferramenta
+              ⚓ Adicionar
             </button>
           </div>
 
-          {/* LISTA */}
+          {/* GRÁFICO */}
+          <div style={{
+            width: "250px",
+            background: "white",
+            padding: "10px",
+            borderRadius: "10px"
+          }}>
+            <h4>Resumo</h4>
+            <Pie data={chartData} />
+          </div>
+
+        </div>
+
+        <br />
+
+        {/* LISTA */}
+        <div style={{
+          background: "white",
+          padding: "20px",
+          borderRadius: "10px"
+        }}>
           <h3>Ferramentas</h3>
 
           {tools.length === 0 && (
             <p>Nenhuma ferramenta cadastrada</p>
           )}
 
-          {/* BOTÃO PRINCIPAL */}
-          <div style={{ marginBottom: "10px" }}>
-            <button
-              onClick={() => setDeleteMode(!deleteMode)}
-              style={{
-                backgroundColor: "orange",
-                color: "white",
-                padding: "8px",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer"
-              }}
-            >
-              🗑️ {deleteMode ? "Cancelar" : "Modo deletar"}
-            </button>
-
-            {deleteMode && (
-              <button
-                onClick={deleteSelected}
-                style={{
-                  marginLeft: "10px",
-                  backgroundColor: "red",
-                  color: "white",
-                  padding: "8px",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer"
-                }}
-              >
-                ✅ Confirmar exclusão
-              </button>
-            )}
-          </div>
-
-          {/* LISTA */}
           {tools.map(t => {
-            const today = new Date();
             const expiry = new Date(t.expiry_date);
-            const expired = expiry < today;
+            const expired = expiry < new Date();
 
             return (
-              <div key={t.id} style={{
-                background: expired ? "#fee2e2" : "#dcfce7",
-                padding: "12px",
-                marginBottom: "10px",
-                borderRadius: "6px",
-                border: expired ? "1px solid red" : "1px solid green"
-              }}>
-
-                {deleteMode && (
-                  <input
-                    type="checkbox"
-                    checked={selectedTools.includes(t.id)}
-                    onChange={() => toggleSelect(t.id)}
-                  />
-                )}
-
+              <div
+                key={t.id}
+                style={{
+                  background: expired ? "#fee2e2" : "#dcfce7",
+                  padding: "12px",
+                  marginBottom: "10px",
+                  borderRadius: "6px",
+                  border: expired ? "1px solid red" : "1px solid green"
+                }}
+              >
                 <strong>{t.name}</strong><br />
                 Responsável: {t.responsible}<br />
                 Expira em: {t.expiry_date}<br />
 
-                <span style={{ fontWeight: "bold" }}>
+                <span>
                   {expired ? "🔴 VENCIDO" : "🟢 EM DIA"}
                 </span>
               </div>
             );
           })}
-
         </div>
+
       </div>
     </div>
   );
