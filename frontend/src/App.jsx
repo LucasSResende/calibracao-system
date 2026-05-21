@@ -99,30 +99,124 @@ export default function App() {
   }
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <strong>Usuário logado</strong>
-        <button onClick={logout}>Sair</button>
-      </div>
-
-      <h2>Sistema de Calibração</h2>
-
-      <input onChange={e => setName(e.target.value)} placeholder="Nome" />
-      <input onChange={e => setResponsible(e.target.value)} placeholder="Responsável" />
-      <input onChange={e => setDate(e.target.value)} type="date" />
-      <input onChange={e => setMonths(e.target.value)} placeholder="Meses" />
-
-      <button onClick={addTool}>Adicionar</button>
-
-      <h3>Ferramentas</h3>
-
-      {tools.length === 0 && <p>Nenhuma ferramenta cadastrada</p>}
-
-      {tools.map(t => (
-        <div key={t.id}>
-          {t.name} - {t.responsible} - {t.expiry_date}
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        fontFamily: "Arial",
+        padding: "30px"
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "rgba(255,255,255,0.9)",
+          padding: "20px",
+          borderRadius: "10px",
+          maxWidth: "600px",
+          margin: "auto"
+        }}
+      >
+        {/* 🔝 TOPO */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            backgroundColor: "#1e3a8a",
+            color: "white",
+            padding: "10px",
+            borderRadius: "5px"
+          }}
+        >
+          <strong>⚓ Sistema de Calibração</strong>
+          <button
+            onClick={logout}
+            style={{
+              background: "white",
+              color: "#1e3a8a",
+              border: "none",
+              padding: "5px 10px",
+              borderRadius: "5px",
+              cursor: "pointer"
+            }}
+          >
+            Sair
+          </button>
         </div>
-      ))}
+
+        <br />
+
+        {/* 📥 INPUTS */}
+        <input
+          placeholder="Nome"
+          onChange={(e) => setName(e.target.value)}
+        />
+        <br /><br />
+
+        <input
+          placeholder="Responsável"
+          onChange={(e) => setResponsible(e.target.value)}
+        />
+        <br /><br />
+
+        <input
+          type="date"
+          onChange={(e) => setDate(e.target.value)}
+        />
+        <br /><br />
+
+        <input
+          placeholder="Meses"
+          onChange={(e) => setMonths(e.target.value)}
+        />
+        <br /><br />
+
+        <button
+          onClick={addTool}
+          style={{
+            backgroundColor: "#2563eb",
+            color: "white",
+            border: "none",
+            padding: "10px",
+            borderRadius: "5px",
+            cursor: "pointer",
+            width: "100%"
+          }}
+        >
+          ⚓ Adicionar Ferramenta
+        </button>
+
+        <br /><br />
+
+        {/* 📋 LISTA */}
+        <h3>Ferramentas</h3>
+
+        {tools.length === 0 && (
+          <p>Nenhuma ferramenta cadastrada</p>
+        )}
+
+        {tools.map((t) => (
+          <div
+            key={t.id}
+            style={{
+              background: "#f0f9ff",
+              padding: "10px",
+              marginBottom: "10px",
+              borderRadius: "5px",
+              border: "1px solid #bae6fd"
+            }}
+          >
+            <strong>{t.name}</strong>
+            <br />
+            Responsável: {t.responsible}
+            <br />
+            Expira em: {t.expiry_date}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
