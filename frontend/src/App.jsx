@@ -89,14 +89,57 @@ export default function App() {
 
   if (!logged) {
     return (
-      <div>
-        <h2>Login</h2>
-        <input onChange={e => setUser(e.target.value)} placeholder="Usuário" />
-        <input onChange={e => setPass(e.target.value)} type="password" placeholder="Senha" />
-        <button onClick={login}>Entrar</button>
+      <div style={{
+        minHeight: "100vh",
+        backgroundImage: "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}>
+        <div style={{
+          background: "rgba(255,255,255,0.9)",
+          padding: "30px",
+          borderRadius: "10px",
+          width: "300px",
+          textAlign: "center"
+        }}>
+          <h2>⚓ Login</h2>
+
+          <input
+            placeholder="Usuário"
+            onChange={e => setUser(e.target.value)}
+            style={{ width: "100%", padding: "8px" }}
+          />
+          <br /><br />
+
+          <input
+            type="password"
+            placeholder="Senha"
+            onChange={e => setPass(e.target.value)}
+            style={{ width: "100%", padding: "8px" }}
+          />
+          <br /><br />
+
+          <button
+            onClick={login}
+            style={{
+              backgroundColor: "#2563eb",
+              color: "white",
+              border: "none",
+              padding: "10px",
+              width: "100%",
+              borderRadius: "5px"
+            }}
+          >
+            Entrar
+          </button>
+        </div>
       </div>
     );
   }
+
 
   return (
     <div
