@@ -93,17 +93,29 @@ export default function App() {
   };
 
   const deleteTool = async (id) => {
+
+    const confirmar = window.confirm("Tem certeza que deseja apagar essa ferramenta?");
+
+    if (!confirmar) return;
+
     const token = localStorage.getItem("token");
 
-    await fetch(`${API}/tools/${id}`, {
+    const res = await fetch(`${API}/tools/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
 
-    loadTools();
+    console.log("resposta delete:", res);
+
+    if (res.ok) {
+      loadTools();
+    } else {
+      alert("Erro ao deletar");
+    }
   };
+
 
 
   useEffect(() => {
@@ -305,16 +317,13 @@ export default function App() {
             const expired = expiry < today;
 
             return (
-              <div
-                key={t.id}
-                style={{
-                  background: expired ? "#fee2e2" : "#dcfce7",
-                  padding: "12px",
-                  marginBottom: "10px",
-                  borderRadius: "6px",
-                  border: expired ? "1px solid red" : "1px solid green"
-                }}
-              >
+              <div key={t.id} style={{
+                background: expired ? "#fee2e2" : "#dcfce7",
+                padding: "12px",
+                marginBottom: "10px",
+                borderRadius: "6px",
+                border: expired ? "1px solid red" : "1px solid green"
+              }}>
                 <strong>{t.name}</strong><br />
                 Responsável: {t.responsible}<br />
                 Expira em: {t.expiry_date}<br />
@@ -322,6 +331,12 @@ export default function App() {
                 <span style={{ fontWeight: "bold" }}>
                   {expired ? "🔴 VENCIDO" : "🟢 EM DIA"}
                 </span>
+
+                <br />
+
+                <button onClick={() => deleteTool(t.id)}>
+                  🗑️ Apagar
+                </button>
               </div>
             );
           })}
