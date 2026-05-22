@@ -1,19 +1,49 @@
-# Sistema de Calibração de Ferramentas
+# ⚓ Sistema de Calibração Naval
 
-Projeto fullstack com:
+Sistema web fullstack para gerenciamento de ferramentas de calibração, com autenticação segura, dashboard e controle de validade.
 
-- Frontend: React (Vite)
-- Backend: FastAPI (Python)
-- Banco: Supabase (PostgreSQL)
+---
 
-## Como rodar
-
-### Backend
-cd backend
-uvicorn main:app --reload
+## 🚀 Tecnologias
 
 ### Frontend
-cd frontend
-npm install
-npm run dev
-``
+- React + Vite
+- Chart.js
+- PWA
+
+### Backend
+- FastAPI
+- JWT (Autenticação)
+
+### Banco de Dados
+- PostgreSQL (Supabase)
+
+### Deploy
+- Vercel (Frontend)
+- Render (Backend)
+
+---
+
+## 🔐 Funcionalidades
+
+- Login com JWT
+- Cadastro de ferramentas
+- Listagem de ferramentas
+- Exclusão múltipla com confirmação
+- Dashboard com gráfico
+- Status automático (OK / Vencido)
+- Responsivo (Desktop + Mobile)
+- PWA (instalável)
+
+---
+
+## 📊 Dashboard
+
+- Gráfico de status (Ferramentas válidas x vencidas)
+- Atualização automática
+- Visualização simples e direta
+
+---
+
+## 🔧 Estrutura do Projeto
+
