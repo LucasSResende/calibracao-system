@@ -61,27 +61,29 @@ Permite acompanhar prazos de validade, responsáveis e status em tempo real.
 
 ## 📁 Estrutura do Projeto
 
+```
 calibracao-system/
 │
 ├── backend/
-│   ├── main.py
-│   ├── database.py
-│   ├── security.py
-│   ├── models.py
-│   └── requirements.txt
+│   ├── main.py            # API principal
+│   ├── database.py        # conexão com banco
+│   ├── security.py        # hash e autenticação JWT
+│   ├── models.py          # modelos (em evolução)
+│   └── requirements.txt   # dependências backend
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   ├── index.css
-│   │   └── assets/
+│   │   ├── App.jsx        # componente principal
+│   │   ├── main.jsx       # entry point React
+│   │   ├── index.css      # estilos globais
+│   │   └── assets/        # arquivos estáticos
 │   │
 │   ├── public/
-│   ├── package.json
-│   └── vite.config.js
+│   ├── package.json       # dependências frontend
+│   └── vite.config.js     # config do Vite
 │
 └── README.md
+```
 
 ---
 
