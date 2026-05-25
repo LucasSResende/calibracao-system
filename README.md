@@ -1,24 +1,36 @@
 # ⚓ Sistema de Calibração Naval
 
-Sistema web fullstack para gerenciamento de ferramentas de calibração com autenticação segura, dashboard e controle de validade.
+Aplicação web fullstack para controle de ferramentas de calibração, com autenticação segura, dashboard visual e gerenciamento de validade.
 
 ---
 
-## 🚀 Tecnologias
+## 📌 Visão Geral
 
-### Frontend
-- React + Vite
-- Chart.js
-- PWA
+O **Sistema de Calibração Naval** foi desenvolvido para substituir controles manuais (planilhas) e oferecer uma solução centralizada, segura e acessível para gestão de ferramentas.
 
-### Backend
-- FastAPI
+Permite acompanhar prazos de validade, responsáveis e status em tempo real.
+
+---
+
+## 🚀 Tecnologias Utilizadas
+
+### 🖥️ Frontend
+- React (Vite)
+- JavaScript (ES6+)
+- Chart.js (Dashboard)
+- CSS (layout responsivo)
+- PWA (Progressive Web App)
+
+### ⚙️ Backend
+- FastAPI (Python)
 - JWT (Autenticação)
+- OAuth2PasswordBearer
 
-### Banco de Dados
-- PostgreSQL (Supabase)
+### 🗄️ Banco de Dados
+- PostgreSQL
+- Supabase (Cloud)
 
-### Deploy
+### ☁️ Deploy
 - Vercel (Frontend)
 - Render (Backend)
 
@@ -26,80 +38,128 @@ Sistema web fullstack para gerenciamento de ferramentas de calibração com aute
 
 ## 🔐 Funcionalidades
 
-- Login com JWT
-- Cadastro de ferramentas
-- Listagem de ferramentas
-- Exclusão múltipla com confirmação
-- Dashboard com gráfico
-- Status automático (OK / Vencido)
-- Responsivo (Desktop + Mobile)
-- PWA (instalável)
+✔ Autenticação segura com JWT  
+✔ Cadastro de ferramentas  
+✔ Listagem dinâmica  
+✔ Exclusão múltipla com confirmação  
+✔ Dashboard com gráfico (Chart.js)  
+✔ Status automático:
+- OK (válido)
+- VENCIDO  
+
+✔ Interface responsiva (Desktop + Mobile)  
+✔ Aplicação instalável (PWA)
 
 ---
 
 ## 📊 Dashboard
 
-- Gráfico de status (Ferramentas válidas x vencidas)
-- Atualização automática
+- Visualização gráfica de ferramentas válidas e vencidas
+- Atualização automática baseada nos dados do banco
 
 ---
 
 ## 📁 Estrutura do Projeto
 
-~~~text
-frontend/
- ├── src/
- │   ├── App.jsx
- │   ├── main.jsx
- │   ├── index.css
- └── public/
-
-backend/
- ├── main.py
- ├── database.py
- ├── security.py
-~~~
+calibracao-system/
+│
+├── backend/
+│   ├── main.py
+│   ├── database.py
+│   ├── security.py
+│   ├── models.py
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   ├── index.css
+│   │   └── assets/
+│   │
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.js
+│
+└── README.md
 
 ---
 
 ## 🔄 Fluxo do Sistema
 
 1. Usuário realiza login  
-2. Token JWT é gerado  
-3. Token é salvo no navegador  
-4. Requisições autenticadas são enviadas ao backend  
-5. Usuário gerencia ferramentas  
+2. Backend valida credenciais  
+3. Token JWT é gerado  
+4. Token é salvo no navegador (localStorage)  
+5. Requisições usam Authorization Bearer  
+6. Backend valida o token  
+7. Usuário gerencia ferramentas  
+
+---
+
+## 🌐 API (Backend)
+
+### 🔹 Login
+POST /login
+
+### 🔹 Listar ferramentas
+GET /tools
+
+### 🔹 Criar ferramenta
+POST /tools
+
+### 🔹 Deletar ferramenta
+DELETE /tools/{id}
 
 ---
 
 ## 📱 PWA (Aplicativo)
 
-- Pode ser usado no celular
-- Interface adaptável
+- Pode ser instalado no celular
+- Funciona como app
+- Interface responsiva
 
 ---
 
-## 🌐 Acesso
+## 🔗 Acesso
 
 Frontend:
-https://seu-projeto.vercel.app
+https://seu-projeto.vercel.app  
 
 Backend:
-https://seu-backend.onrender.com
+https://seu-backend.onrender.com  
+
+---
+
+## ⚠️ Observações Técnicas
+
+- IDs usam UUID (Supabase)
+- Senhas armazenadas com hash seguro
+- JWT controla autenticação
+- CORS habilitado para integração frontend/backend
 
 ---
 
 ## 🚀 Melhorias Futuras
 
-- Edição de ferramentas
-- Filtro e busca
-- Alertas automáticos
-- Multiusuário
-- Exportação para Excel
-- Dashboard avançado
+- Edição de ferramentas  
+- Busca e filtros  
+- Dashboard avançado  
+- Exportação (Excel/PDF)  
+- Histórico de alterações  
+- Multiempresa (SaaS)  
+- Alertas automáticos  
 
 ---
 
 ## 👨‍💻 Autor
 
-Lucas de Souza Resende
+Lucas de Souza Resende  
+
+---
+
+## 🏆 Status do Projeto
+
+🚧 Em evolução  
+✅ Funcional e em produção  
+🚀 Caminho para SaaS completo  
